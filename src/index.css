@@ -3,16 +3,96 @@
 @tailwind utilities;
 
 :root {
-  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-family: 'DM Sans', system-ui, sans-serif;
 }
 
-body {
-  @apply min-h-screen bg-base-100 text-base-content;
-}
+/* ── Scrollbar ──────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #172030; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #253550; }
 
-/* Preserve whitespace in assistant messages */
+/* ── Preserve whitespace in messages ────────────────────── */
 .chat-message pre,
 .chat-message code {
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+/* ── Streaming cursor ───────────────────────────────────── */
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.streaming-cursor::after {
+  content: '▋';
+  animation: cursor-blink 1s step-end infinite;
+  color: #38bdf8;
+  margin-left: 2px;
+  font-size: 0.78em;
+  vertical-align: text-bottom;
+}
+
+/* ── Message appear animation ───────────────────────────── */
+@keyframes msg-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.msg-appear {
+  animation: msg-in 0.18s ease-out both;
+}
+
+/* ── Prose overrides ─────────────────────────────────────── */
+.prose pre {
+  background: #060b18 !important;
+  border: 1px solid #1e2d45 !important;
+  border-radius: 3px !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 0.8rem !important;
+  line-height: 1.6 !important;
+}
+
+.prose code {
+  font-family: 'JetBrains Mono', monospace !important;
+  background: #0c1222 !important;
+  border: 1px solid #172030 !important;
+  padding: 1px 5px !important;
+  border-radius: 3px !important;
+  font-size: 0.81em !important;
+  color: #7dd3fc !important;
+}
+
+.prose :where(code)::before,
+.prose :where(code)::after {
+  content: '' !important;
+}
+
+.prose a {
+  color: #38bdf8 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 2px !important;
+}
+
+.prose blockquote {
+  border-left-color: #1e2d45 !important;
+  color: inherit !important;
+  opacity: 0.7;
+}
+
+/* ── Input focus glow ───────────────────────────────────── */
+.agent-input-wrap {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.agent-input-wrap:focus-within {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.08), 0 0 20px rgba(56, 189, 248, 0.04);
+}
+
+/* ── Dropdown options inherit theme bg ──────────────────── */
+select option {
+  background: #0c1222;
+  color: #dde6f0;
 }

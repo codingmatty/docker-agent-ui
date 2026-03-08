@@ -15,11 +15,36 @@ export interface Session {
 export interface Message {
   role: 'user' | 'assistant' | 'system';
   content: string;
+  /** When set, shown as collapsible "Thoughts" (from API content parts with type "thinking"). */
+  thoughts?: string[];
 }
 
 export interface SessionDetail extends Session {
   messages?: Message[];
   permissions?: unknown;
+}
+
+// Raw API response: session messages are an array of Item (message | sub_session | summary | cost).
+// Inner message may use Role/Content (Go default) or role/content (snake_case).
+export interface SessionItemMessage {
+  agentName?: string;
+  message: {
+    role?: string;
+    Role?: string;
+    content?: string;
+    Content?: string;
+    multi_content?: Array<{ type?: string; text?: string; [key: string]: unknown }>;
+    MultiContent?: Array<{ type?: string; text?: string; [key: string]: unknown }>;
+    [key: string]: unknown;
+  };
+  implicit?: boolean;
+}
+
+export interface SessionItem {
+  message?: SessionItemMessage;
+  sub_session?: unknown;
+  summary?: string;
+  cost?: number;
 }
 
 // SSE event types from agent execution
