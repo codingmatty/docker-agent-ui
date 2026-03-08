@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  @apply min-h-screen bg-base-100 text-base-content;
+}
+
+/* Preserve whitespace in assistant messages */
+.chat-message pre,
+.chat-message code {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
