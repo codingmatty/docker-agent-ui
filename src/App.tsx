@@ -1,5 +1,5 @@
-import { useState, useCallback, useEffect } from 'react';
-import type { Agent, Session, Message, StreamEvent } from './types';
+import { useState, useCallback, useEffect } from "react";
+import type { Agent, Session, Message, StreamEvent } from "./types";
 import {
   getAgents,
   getSessions,
@@ -11,28 +11,39 @@ import {
   resumeSession,
   toggleYolo,
   runAgent,
-} from './api';
-import { SessionSidebar } from './SessionSidebar';
-import { ChatView } from './ChatView';
-import { ToolConfirmModal } from './ToolConfirmModal';
+} from "./api";
+import { SessionSidebar } from "./SessionSidebar";
+import { ChatView } from "./ChatView";
+import { ToolConfirmModal } from "./ToolConfirmModal";
 
-const themes = ['void', 'dark', 'light', 'nord', 'dracula', 'business', 'cupcake'];
+const themes = [
+  "void",
+  "dark",
+  "light",
+  "nord",
+  "dracula",
+  "business",
+  "cupcake",
+];
 
 export default function App() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [currentSession, setCurrentSession] = useState<Session | null>(null);
-  const [sessionDetail, setSessionDetail] = useState<{ messages: Message[] } | null>(null);
-  const [selectedAgent, setSelectedAgent] = useState<string>('');
-  const [streamingContent, setStreamingContent] = useState('');
+  const [sessionDetail, setSessionDetail] = useState<{
+    messages: Message[];
+  } | null>(null);
+  const [selectedAgent, setSelectedAgent] = useState<string>("");
+  const [streamingContent, setStreamingContent] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
-  const [pendingToolConfirm, setPendingToolConfirm] = useState<StreamEvent | null>(null);
+  const [pendingToolConfirm, setPendingToolConfirm] =
+    useState<StreamEvent | null>(null);
   const [yolo, setYolo] = useState(false);
   const [theme, setTheme] = useState(() => {
-    if (typeof document !== 'undefined' && document.documentElement) {
-      return document.documentElement.getAttribute('data-theme') || 'void';
+    if (typeof document !== "undefined" && document.documentElement) {
+      return document.documentElement.getAttribute("data-theme") || "void";
     }
-    return 'void';
+    return "void";
   });
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +54,7 @@ export default function App() {
       setAgents(list);
       if (list.length && !selectedAgent) setSelectedAgent(list[0].name);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load agents');
+      setError(e instanceof Error ? e.message : "Failed to load agents");
     }
   }, [selectedAgent]);
 
@@ -52,7 +63,7 @@ export default function App() {
       const list = await getSessions();
       setSessions(list);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load sessions');
+      setError(e instanceof Error ? e.message : "Failed to load sessions");
     }
   }, []);
 
@@ -63,7 +74,7 @@ export default function App() {
       setSessionDetail({ messages });
     } catch (e) {
       setSessionDetail(null);
-      setError(e instanceof Error ? e.message : 'Failed to load session');
+      setError(e instanceof Error ? e.message : "Failed to load session");
     }
   }, []);
 
@@ -83,17 +94,17 @@ export default function App() {
       setSessions((prev) => [session, ...prev]);
       setCurrentSession(session);
       setSessionDetail({ messages: [] });
-      setStreamingContent('');
+      setStreamingContent("");
       setError(null);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to create session');
+      setError(e instanceof Error ? e.message : "Failed to create session");
     }
   }, []);
 
   const handleSelectSession = useCallback((session: Session) => {
     setCurrentSession(session);
     setPendingToolConfirm(null);
-    setStreamingContent('');
+    setStreamingContent("");
   }, []);
 
   const handleDeleteSession = useCallback(
@@ -106,10 +117,10 @@ export default function App() {
           setSessionDetail(null);
         }
       } catch (e) {
-        setError(e instanceof Error ? e.message : 'Failed to delete session');
+        setError(e instanceof Error ? e.message : "Failed to delete session");
       }
     },
-    [currentSession?.id]
+    [currentSession?.id],
   );
 
   const handleSendMessage = useCallback(
@@ -117,36 +128,47 @@ export default function App() {
       if (!currentSession?.id || !selectedAgent) return;
       const messages: Message[] = [
         ...(sessionDetail?.messages ?? []),
-        { role: 'user', content },
+        { role: "user", content },
       ];
-      setStreamingContent('');
+      setStreamingContent("");
       setIsStreaming(true);
       setError(null);
+      setSessionDetail((prev) => ({
+        messages: [...(prev?.messages ?? []), { role: "user", content }],
+      }));
       try {
-        await runAgent(currentSession.id, selectedAgent, messages, (event: StreamEvent) => {
-          switch (event.type) {
-            case 'agent_choice':
-              setStreamingContent((prev) => prev + (event.content ?? ''));
-              break;
-            case 'stream_stopped':
-              setIsStreaming(false);
-              loadSessionDetail(currentSession.id);
-              loadSessions();
-              break;
-            case 'tool_call_confirmation':
-              setPendingToolConfirm(event);
-              break;
-            case 'error':
-              setIsStreaming(false);
-              setError((event as { message?: string }).message ?? 'Agent error');
-              break;
-            default:
-              break;
-          }
-        });
+        await runAgent(
+          currentSession.id,
+          selectedAgent,
+          messages,
+          (event: StreamEvent) => {
+            switch (event.type) {
+              case "agent_choice":
+                setStreamingContent((prev) => prev + (event.content ?? ""));
+                break;
+              case "stream_stopped":
+                setIsStreaming(false);
+                setStreamingContent("");
+                loadSessionDetail(currentSession.id);
+                loadSessions();
+                break;
+              case "tool_call_confirmation":
+                setPendingToolConfirm(event);
+                break;
+              case "error":
+                setIsStreaming(false);
+                setError(
+                  (event as { message?: string }).message ?? "Agent error",
+                );
+                break;
+              default:
+                break;
+            }
+          },
+        );
       } catch (e) {
         setIsStreaming(false);
-        setError(e instanceof Error ? e.message : 'Request failed');
+        setError(e instanceof Error ? e.message : "Request failed");
       }
     },
     [
@@ -155,7 +177,7 @@ export default function App() {
       sessionDetail?.messages,
       loadSessionDetail,
       loadSessions,
-    ]
+    ],
   );
 
   const handleToolConfirm = useCallback(
@@ -166,10 +188,10 @@ export default function App() {
         setPendingToolConfirm(null);
         loadSessionDetail(currentSession.id);
       } catch (e) {
-        setError(e instanceof Error ? e.message : 'Resume failed');
+        setError(e instanceof Error ? e.message : "Resume failed");
       }
     },
-    [currentSession?.id, pendingToolConfirm, loadSessionDetail]
+    [currentSession?.id, pendingToolConfirm, loadSessionDetail],
   );
 
   const handleToggleYolo = useCallback(async () => {
@@ -178,7 +200,7 @@ export default function App() {
       await toggleYolo(currentSession.id);
       setYolo((prev) => !prev);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Toggle failed');
+      setError(e instanceof Error ? e.message : "Toggle failed");
     }
   }, [currentSession?.id]);
 
@@ -187,14 +209,15 @@ export default function App() {
       try {
         await patchSessionTitle(sessionId, title);
         setSessions((prev) =>
-          prev.map((s) => (s.id === sessionId ? { ...s, title } : s))
+          prev.map((s) => (s.id === sessionId ? { ...s, title } : s)),
         );
-        if (currentSession?.id === sessionId) setCurrentSession((s) => (s ? { ...s, title } : null));
+        if (currentSession?.id === sessionId)
+          setCurrentSession((s) => (s ? { ...s, title } : null));
       } catch (e) {
-        setError(e instanceof Error ? e.message : 'Update title failed');
+        setError(e instanceof Error ? e.message : "Update title failed");
       }
     },
-    [currentSession?.id]
+    [currentSession?.id],
   );
 
   return (
@@ -215,17 +238,36 @@ export default function App() {
             htmlFor="sidebar-drawer"
             className="drawer-button lg:hidden cursor-pointer p-1 text-base-content/40 hover:text-base-content/70 transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             </svg>
           </label>
 
           {/* Brand */}
           <div className="flex items-center gap-2.5 shrink-0">
             <div className="w-7 h-7 rounded border border-primary/30 bg-primary/10 flex items-center justify-center">
-              <svg className="w-3.5 h-3.5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                  d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+              <svg
+                className="w-3.5 h-3.5 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"
+                />
               </svg>
             </div>
             <span className="font-syne font-bold text-[13px] tracking-[0.18em] text-base-content uppercase">
@@ -249,7 +291,7 @@ export default function App() {
               {agents.map((a) => (
                 <option key={a.name} value={a.name}>
                   {a.name}
-                  {a.description ? ` — ${a.description}` : ''}
+                  {a.description ? ` — ${a.description}` : ""}
                 </option>
               ))}
             </select>
@@ -264,11 +306,11 @@ export default function App() {
                 onClick={handleToggleYolo}
                 className={`font-mono text-[9px] uppercase tracking-[0.22em] px-2.5 py-1 rounded border transition-all ${
                   yolo
-                    ? 'border-warning/50 text-warning bg-warning/10'
-                    : 'border-base-300 text-base-content/25 hover:border-base-content/20 hover:text-base-content/50'
+                    ? "border-warning/50 text-warning bg-warning/10"
+                    : "border-base-300 text-base-content/25 hover:border-base-content/20 hover:text-base-content/50"
                 }`}
               >
-                yolo {yolo ? 'on' : 'off'}
+                yolo {yolo ? "on" : "off"}
               </button>
             )}
 
@@ -279,9 +321,18 @@ export default function App() {
                 className="cursor-pointer p-1.5 rounded text-base-content/30 hover:text-base-content/60 transition-colors"
                 title="Change theme"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                    d="M12 3v1m0 16v1M3 12h1m16 0h1m-2.636-7.364-.707.707M6.343 17.657l-.707.707m0-12.728.707.707m11.314 11.314.707.707M12 7a5 5 0 100 10 5 5 0 000-10z" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M12 3v1m0 16v1M3 12h1m16 0h1m-2.636-7.364-.707.707M6.343 17.657l-.707.707m0-12.728.707.707m11.314 11.314.707.707M12 7a5 5 0 100 10 5 5 0 000-10z"
+                  />
                 </svg>
               </label>
               <ul
@@ -293,13 +344,13 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => {
-                        document.documentElement.setAttribute('data-theme', t);
+                        document.documentElement.setAttribute("data-theme", t);
                         setTheme(t);
                       }}
                       className={`w-full text-left px-3 py-1.5 rounded text-[11px] font-mono transition-colors ${
                         theme === t
-                          ? 'bg-primary/15 text-primary'
-                          : 'text-base-content/45 hover:text-base-content hover:bg-base-300'
+                          ? "bg-primary/15 text-primary"
+                          : "text-base-content/45 hover:text-base-content hover:bg-base-300"
                       }`}
                     >
                       {t}
