@@ -40,12 +40,12 @@ export function SessionSidebar({
 
         {/* ── Sidebar header ───────────────────────────────── */}
         <div className="h-12 flex items-center justify-between px-4 border-b border-base-300 shrink-0">
-          <span className="font-mono text-[9px] uppercase tracking-[0.28em] text-base-content/25">
+          <span className="font-mono text-[9px] uppercase tracking-[0.28em] text-base-content/75">
             sessions
           </span>
           <button
             type="button"
-            className="w-6 h-6 rounded border border-base-300 flex items-center justify-center font-mono text-base-content/35 hover:text-primary hover:border-primary/40 hover:bg-primary/5 transition-all text-base leading-none"
+            className="w-6 h-6 rounded border border-base-300 flex items-center justify-center font-mono text-base-content/80 hover:text-primary hover:border-primary/40 hover:bg-primary/5 transition-all text-base leading-none"
             onClick={() => {
               onNewSession();
               onClose();
@@ -59,7 +59,7 @@ export function SessionSidebar({
         {/* ── Session list ─────────────────────────────────── */}
         <div className="flex-1 overflow-y-auto py-2">
           {sessions.length === 0 && (
-            <p className="px-4 py-10 text-center font-mono text-[9px] uppercase tracking-[0.22em] text-base-content/20">
+            <p className="px-4 py-10 text-center font-mono text-[9px] uppercase tracking-[0.22em] text-base-content/55">
               No sessions yet
             </p>
           )}
@@ -70,7 +70,7 @@ export function SessionSidebar({
                 <div className="flex gap-1 items-center py-1.5 px-1">
                   <input
                     type="text"
-                    className="flex-1 bg-base-300/60 border border-primary/40 rounded-sm px-2 py-1 text-xs font-mono outline-none text-base-content/85 placeholder:text-base-content/25"
+                    className="flex-1 bg-base-300/60 border border-primary/40 rounded-sm px-2 py-1 text-xs font-mono outline-none text-base-content/85 placeholder:text-base-content/45"
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
                     onKeyDown={(e) => {
@@ -81,7 +81,7 @@ export function SessionSidebar({
                   />
                   <button
                     type="button"
-                    className="shrink-0 px-2 py-1 font-mono text-[9px] uppercase tracking-wider text-primary/60 hover:text-primary transition-colors"
+                    className="shrink-0 px-2 py-1 font-mono text-[9px] uppercase tracking-wider text-primary/80 hover:text-primary transition-colors"
                     onClick={() => saveTitle(s.id)}
                   >
                     ok
@@ -106,11 +106,11 @@ export function SessionSidebar({
                     <div className={`text-xs truncate transition-colors ${
                       currentSession?.id === s.id
                         ? 'text-base-content/90'
-                        : 'text-base-content/50 group-hover:text-base-content/75'
+                        : 'text-base-content/70 group-hover:text-base-content/90'
                     }`}>
                       {s.title || `session_${s.id.slice(0, 8)}`}
                     </div>
-                    <div className="font-mono text-[9px] text-base-content/18 mt-0.5 tracking-wider">
+                    <div className="font-mono text-[9px] text-base-content/45 mt-0.5 tracking-wider">
                       {s.id.slice(0, 12)}…
                     </div>
                   </button>
@@ -119,7 +119,7 @@ export function SessionSidebar({
                   <div className="opacity-0 group-hover:opacity-100 flex items-center gap-0.5 transition-opacity shrink-0">
                     <button
                       type="button"
-                      className="w-5 h-5 flex items-center justify-center rounded text-base-content/25 hover:text-base-content/60 transition-colors text-xs"
+                      className="w-5 h-5 flex items-center justify-center rounded text-base-content/55 hover:text-base-content/85 transition-colors text-xs"
                       onClick={() => startEdit(s)}
                       aria-label="Edit title"
                     >
@@ -127,7 +127,7 @@ export function SessionSidebar({
                     </button>
                     <button
                       type="button"
-                      className="w-5 h-5 flex items-center justify-center rounded text-base-content/25 hover:text-error transition-colors text-base leading-none"
+                      className="w-5 h-5 flex items-center justify-center rounded text-base-content/55 hover:text-error transition-colors text-base leading-none"
                       onClick={() => onDeleteSession(s.id)}
                       aria-label="Delete"
                     >

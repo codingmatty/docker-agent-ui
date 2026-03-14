@@ -45,9 +45,9 @@ export function ChatView({
     return (
       <div className="flex-1 flex flex-col items-center justify-center gap-5 p-8">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-12 h-12 rounded border border-primary/20 bg-primary/5 flex items-center justify-center">
+          <div className="w-12 h-12 rounded border border-primary/60 bg-primary/10 flex items-center justify-center">
             <svg
-              className="w-6 h-6 text-primary/40"
+              className="w-6 h-6 text-primary/85"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -60,13 +60,13 @@ export function ChatView({
               />
             </svg>
           </div>
-          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-base-content/25">
+          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-base-content/75">
             No session selected
           </p>
         </div>
         <button
           type="button"
-          className="font-mono text-[10px] uppercase tracking-[0.22em] px-5 py-2.5 border border-primary/30 text-primary/60 hover:text-primary hover:border-primary hover:bg-primary/5 transition-all rounded-sm"
+          className="font-mono text-[10px] uppercase tracking-[0.22em] px-5 py-2.5 border border-primary/70 text-primary hover:text-primary hover:border-primary hover:bg-primary/10 transition-all rounded-sm"
           onClick={onNewSession}
         >
           + New session
@@ -92,9 +92,9 @@ export function ChatView({
           {/* Empty state */}
           {displayMessages.length === 0 && (
             <div className="flex flex-col items-center gap-2 py-20 text-center">
-              <div className="w-8 h-8 rounded border border-primary/15 bg-primary/5 flex items-center justify-center mb-2">
+              <div className="w-8 h-8 rounded border border-primary/40 bg-primary/8 flex items-center justify-center mb-2">
                 <svg
-                  className="w-4 h-4 text-primary/35"
+                  className="w-4 h-4 text-primary/65"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -107,10 +107,10 @@ export function ChatView({
                   />
                 </svg>
               </div>
-              <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-base-content/20">
+              <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-base-content/60">
                 Session ready
               </p>
-              <p className="font-mono text-[10px] text-base-content/15 mt-1">
+              <p className="font-mono text-[10px] text-base-content/50 mt-1">
                 type /new to start a fresh session
               </p>
             </div>
@@ -134,8 +134,8 @@ export function ChatView({
                 <div
                   className={`shrink-0 w-6 h-6 rounded border flex items-center justify-center font-mono text-[9px] font-bold mt-0.5 select-none ${
                     isUser
-                      ? "border-accent/30 bg-accent/10 text-accent"
-                      : "border-primary/20 bg-primary/8 text-primary/65"
+                      ? "border-accent/50 bg-accent/10 text-accent"
+                      : "border-primary/40 bg-primary/8 text-primary/85"
                   }`}
                 >
                   {isUser ? "Y" : "A"}
@@ -147,7 +147,7 @@ export function ChatView({
                 >
                   <div
                     className={`text-[9px] font-mono uppercase tracking-[0.22em] mb-1.5 ${
-                      isUser ? "text-accent/35" : "text-primary/35"
+                      isUser ? "text-accent/65" : "text-primary/65"
                     }`}
                   >
                     {isUser ? "you" : "agent"}
@@ -192,13 +192,13 @@ export function ChatView({
       <div className="px-4 py-3 border-t border-base-300 bg-base-200/40 shrink-0">
         <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
           <div className="agent-input-wrap flex items-center border border-base-300 rounded-sm bg-base-300/30">
-            <span className="pl-3 text-primary/40 font-mono text-sm select-none shrink-0 leading-none">
+            <span className="pl-3 text-primary/70 font-mono text-sm select-none shrink-0 leading-none">
               ›
             </span>
             <input
               ref={inputRef}
               type="text"
-              className="flex-1 bg-transparent py-3 px-2.5 text-sm outline-none font-mono text-base-content/85 placeholder:text-base-content/20"
+              className="flex-1 bg-transparent py-3 px-2.5 text-sm outline-none font-mono text-base-content/85 placeholder:text-base-content/40"
               placeholder="send a message..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -213,7 +213,7 @@ export function ChatView({
             ) : (
               <button
                 type="submit"
-                className="px-4 py-3 font-mono text-[9px] uppercase tracking-[0.22em] text-base-content/25 hover:text-primary/70 transition-colors shrink-0 disabled:opacity-0 disabled:cursor-not-allowed border-l border-base-300"
+                className="px-4 py-3 font-mono text-[9px] uppercase tracking-[0.22em] text-base-content/55 hover:text-primary transition-colors shrink-0 disabled:opacity-0 disabled:cursor-not-allowed border-l border-base-300"
                 disabled={!input.trim()}
               >
                 send

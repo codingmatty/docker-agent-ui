@@ -22,14 +22,14 @@ export function ToolConfirmModal({ event, onConfirm }: ToolConfirmModalProps) {
         {/* ── Header ───────────────────────────────────────── */}
         <div className="flex items-center gap-3 px-5 py-4 border-b border-base-300">
           <div className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse shrink-0" />
-          <h3 className="font-mono text-[10px] uppercase tracking-[0.22em] text-base-content/50">
+          <h3 className="font-mono text-[10px] uppercase tracking-[0.22em] text-base-content/75">
             Tool call approval required
           </h3>
         </div>
 
         {/* ── Body ─────────────────────────────────────────── */}
         <div className="px-5 py-4 space-y-3">
-          <p className="font-mono text-[10px] text-base-content/35 uppercase tracking-widest">
+          <p className="font-mono text-[10px] text-base-content/65 uppercase tracking-widest">
             Review the tool call below — approve or reject execution.
           </p>
 
@@ -40,7 +40,7 @@ export function ToolConfirmModal({ event, onConfirm }: ToolConfirmModalProps) {
           <input
             type="text"
             placeholder="Rejection reason (optional)"
-            className="w-full bg-base-300/40 border border-base-300 rounded-sm px-3 py-2 text-xs font-mono outline-none focus:border-error/40 text-base-content/65 placeholder:text-base-content/20 transition-colors"
+            className="w-full bg-base-300/40 border border-base-300 rounded-sm px-3 py-2 text-xs font-mono outline-none focus:border-error/40 text-base-content/80 placeholder:text-base-content/40 transition-colors"
             value={reason}
             onChange={(e) => setReason(e.target.value)}
           />
@@ -50,7 +50,7 @@ export function ToolConfirmModal({ event, onConfirm }: ToolConfirmModalProps) {
         <div className="flex items-center gap-2 px-5 py-4 border-t border-base-300 bg-base-300/20 flex-wrap">
           <button
             type="button"
-            className="px-4 py-2 font-mono text-[9px] uppercase tracking-[0.22em] border border-error/35 text-error/65 hover:border-error/70 hover:text-error hover:bg-error/5 transition-all rounded-sm"
+            className="px-4 py-2 font-mono text-[9px] uppercase tracking-[0.22em] border border-error/55 text-error/85 hover:border-error hover:text-error hover:bg-error/5 transition-all rounded-sm"
             onClick={() => onConfirm("reject", reason || undefined)}
           >
             reject
@@ -58,7 +58,7 @@ export function ToolConfirmModal({ event, onConfirm }: ToolConfirmModalProps) {
           <div className="flex-1" />
           <button
             type="button"
-            className="px-4 py-2 font-mono text-[9px] uppercase tracking-[0.22em] border border-base-300 text-base-content/40 hover:border-base-content/30 hover:text-base-content/70 hover:bg-base-300/40 transition-all rounded-sm"
+            className="px-4 py-2 font-mono text-[9px] uppercase tracking-[0.22em] border border-base-300 text-base-content/65 hover:border-base-content/50 hover:text-base-content/90 hover:bg-base-300/40 transition-all rounded-sm"
             onClick={() => onConfirm("approve")}
           >
             approve once
@@ -73,7 +73,7 @@ export function ToolConfirmModal({ event, onConfirm }: ToolConfirmModalProps) {
           </button> */}
           <button
             type="button"
-            className="px-4 py-2 font-mono text-[9px] uppercase tracking-[0.22em] border border-primary/35 text-primary/65 hover:border-primary/70 hover:text-primary hover:bg-primary/5 transition-all rounded-sm"
+            className="px-4 py-2 font-mono text-[9px] uppercase tracking-[0.22em] border border-primary/55 text-primary/85 hover:border-primary hover:text-primary hover:bg-primary/5 transition-all rounded-sm"
             onClick={() => onConfirm("approve-session")}
           >
             approve session

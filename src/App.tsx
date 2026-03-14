@@ -241,7 +241,7 @@ export default function App() {
           {/* Mobile hamburger */}
           <label
             htmlFor="sidebar-drawer"
-            className="drawer-button lg:hidden cursor-pointer p-1 text-base-content/40 hover:text-base-content/70 transition-colors"
+            className="drawer-button lg:hidden cursor-pointer p-1 text-base-content/65 hover:text-base-content/90 transition-colors"
           >
             <svg
               className="w-5 h-5"
@@ -285,11 +285,11 @@ export default function App() {
 
           {/* Agent selector */}
           <div className="hidden md:flex items-center gap-2 flex-1 min-w-0">
-            <span className="font-mono text-[9px] text-base-content/30 uppercase tracking-[0.22em] shrink-0">
+            <span className="font-mono text-[9px] text-base-content/75 uppercase tracking-[0.22em] shrink-0">
               agent
             </span>
             <select
-              className="bg-transparent border-none outline-none text-sm text-base-content/65 hover:text-base-content/90 transition-colors cursor-pointer font-mono min-w-0 max-w-xs"
+              className="bg-transparent border-none outline-none text-sm text-base-content/80 hover:text-base-content transition-colors cursor-pointer font-mono min-w-0 max-w-xs"
               value={selectedAgent}
               onChange={(e) => setSelectedAgent(e.target.value)}
             >
@@ -312,7 +312,7 @@ export default function App() {
                 className={`font-mono text-[9px] uppercase tracking-[0.22em] px-2.5 py-1 rounded border transition-all ${
                   yolo
                     ? "border-warning/50 text-warning bg-warning/10"
-                    : "border-base-300 text-base-content/25 hover:border-base-content/20 hover:text-base-content/50"
+                    : "border-base-300 text-base-content/60 hover:border-base-content/40 hover:text-base-content/85"
                 }`}
               >
                 yolo {yolo ? "on" : "off"}
@@ -323,7 +323,7 @@ export default function App() {
             <div className="dropdown dropdown-end">
               <label
                 tabIndex={0}
-                className="cursor-pointer p-1.5 rounded text-base-content/30 hover:text-base-content/60 transition-colors"
+                className="cursor-pointer p-1.5 rounded text-base-content/60 hover:text-base-content/90 transition-colors"
                 title="Change theme"
               >
                 <svg
@@ -355,7 +355,7 @@ export default function App() {
                       className={`w-full text-left px-3 py-1.5 rounded text-[11px] font-mono transition-colors ${
                         theme === t
                           ? "bg-primary/15 text-primary"
-                          : "text-base-content/45 hover:text-base-content hover:bg-base-300"
+                          : "text-base-content/70 hover:text-base-content hover:bg-base-300"
                       }`}
                     >
                       {t}
@@ -373,7 +373,7 @@ export default function App() {
             <span className="font-mono text-xs text-error/80">{error}</span>
             <button
               type="button"
-              className="font-mono text-[10px] uppercase tracking-wider text-error/50 hover:text-error transition-colors ml-4"
+              className="font-mono text-[10px] uppercase tracking-wider text-error/75 hover:text-error transition-colors ml-4"
               onClick={() => setError(null)}
             >
               dismiss

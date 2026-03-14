@@ -45,7 +45,7 @@ export function MessageBody({
         <div className="mb-2.5">
           <button
             type="button"
-            className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-base-content/30 hover:text-base-content/50 transition-colors"
+            className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-base-content/55 hover:text-base-content/80 transition-colors"
             onClick={() => setThoughtsExpanded((e) => !e)}
             aria-expanded={thoughtsExpanded}
           >
