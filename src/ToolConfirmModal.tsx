@@ -1,18 +1,24 @@
-import { useState } from 'react';
-import type { StreamEvent } from './types';
+import { useState } from "react";
+import type { StreamEvent } from "./types";
+import type { ResumeConfirmation } from "./api";
 
 interface ToolConfirmModalProps {
   event: StreamEvent;
-  onConfirm: (approved: boolean, denial?: string) => void;
+  onConfirm: (
+    confirmation: ResumeConfirmation,
+    reason?: string,
+    toolName?: string,
+  ) => void;
 }
 
 export function ToolConfirmModal({ event, onConfirm }: ToolConfirmModalProps) {
-  const [denial, setDenial] = useState('');
+  const [reason, setReason] = useState("");
+  // TODO: Add tool name to the modal from the event.. there is no actual tool_name prop
+  // const toolName = (event as Record<string, unknown>).tool_name as string | undefined;
 
   return (
     <dialog open className="modal modal-open">
       <div className="modal-box bg-base-200 border border-base-300 shadow-2xl rounded-sm max-w-2xl p-0 overflow-hidden">
-
         {/* ── Header ───────────────────────────────────────── */}
         <div className="flex items-center gap-3 px-5 py-4 border-b border-base-300">
           <div className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse shrink-0" />
@@ -24,39 +30,53 @@ export function ToolConfirmModal({ event, onConfirm }: ToolConfirmModalProps) {
         {/* ── Body ─────────────────────────────────────────── */}
         <div className="px-5 py-4 space-y-3">
           <p className="font-mono text-[10px] text-base-content/35 uppercase tracking-widest">
-            Review the tool call below — approve or deny execution.
+            Review the tool call below — approve or reject execution.
           </p>
 
           <pre className="bg-base-100 border border-base-300 px-4 py-3 rounded-sm text-[11px] font-mono text-base-content/60 leading-relaxed overflow-x-auto max-h-64 overflow-y-auto">
             {JSON.stringify(event, null, 2)}
           </pre>
+
+          <input
+            type="text"
+            placeholder="Rejection reason (optional)"
+            className="w-full bg-base-300/40 border border-base-300 rounded-sm px-3 py-2 text-xs font-mono outline-none focus:border-error/40 text-base-content/65 placeholder:text-base-content/20 transition-colors"
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+          />
         </div>
 
         {/* ── Actions ──────────────────────────────────────── */}
-        <div className="flex items-center gap-2 px-5 py-4 border-t border-base-300 bg-base-300/20">
-          <input
-            type="text"
-            placeholder="Reason for denial (optional)"
-            className="flex-1 min-w-0 bg-base-300/40 border border-base-300 rounded-sm px-3 py-2 text-xs font-mono outline-none focus:border-error/40 text-base-content/65 placeholder:text-base-content/20 transition-colors"
-            value={denial}
-            onChange={(e) => setDenial(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !denial) onConfirm(true);
-            }}
-          />
+        <div className="flex items-center gap-2 px-5 py-4 border-t border-base-300 bg-base-300/20 flex-wrap">
           <button
             type="button"
-            className="shrink-0 px-4 py-2 font-mono text-[9px] uppercase tracking-[0.22em] border border-error/35 text-error/65 hover:border-error/70 hover:text-error hover:bg-error/5 transition-all rounded-sm"
-            onClick={() => onConfirm(false, denial || undefined)}
+            className="px-4 py-2 font-mono text-[9px] uppercase tracking-[0.22em] border border-error/35 text-error/65 hover:border-error/70 hover:text-error hover:bg-error/5 transition-all rounded-sm"
+            onClick={() => onConfirm("reject", reason || undefined)}
           >
-            deny
+            reject
           </button>
+          <div className="flex-1" />
           <button
             type="button"
-            className="shrink-0 px-4 py-2 font-mono text-[9px] uppercase tracking-[0.22em] border border-primary/35 text-primary/65 hover:border-primary/70 hover:text-primary hover:bg-primary/5 transition-all rounded-sm"
-            onClick={() => onConfirm(true)}
+            className="px-4 py-2 font-mono text-[9px] uppercase tracking-[0.22em] border border-base-300 text-base-content/40 hover:border-base-content/30 hover:text-base-content/70 hover:bg-base-300/40 transition-all rounded-sm"
+            onClick={() => onConfirm("approve")}
           >
-            approve
+            approve once
+          </button>
+          {/* <button
+            type="button"
+            className="px-4 py-2 font-mono text-[9px] uppercase tracking-[0.22em] border border-base-300 text-base-content/40 hover:border-base-content/30 hover:text-base-content/70 hover:bg-base-300/40 transition-all rounded-sm"
+            onClick={() => onConfirm('approve-tool', undefined, toolName)}
+            title={toolName ? `Always allow: ${toolName}` : 'Always allow this tool'}
+          >
+            approve tool
+          </button> */}
+          <button
+            type="button"
+            className="px-4 py-2 font-mono text-[9px] uppercase tracking-[0.22em] border border-primary/35 text-primary/65 hover:border-primary/70 hover:text-primary hover:bg-primary/5 transition-all rounded-sm"
+            onClick={() => onConfirm("approve-session")}
+          >
+            approve session
           </button>
         </div>
       </div>

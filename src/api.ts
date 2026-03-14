@@ -158,9 +158,11 @@ export async function patchSessionTitle(
   });
 }
 
+export type ResumeConfirmation = 'approve' | 'approve-session' | 'approve-tool' | 'reject';
+
 export async function resumeSession(
   sessionId: string,
-  body: { approved?: boolean; denial?: string; [key: string]: unknown }
+  body: { confirmation: ResumeConfirmation; reason?: string; tool_name?: string }
 ): Promise<void> {
   return request(`/sessions/${sessionId}/resume`, {
     method: 'POST',

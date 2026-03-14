@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import type { Agent, Session, Message, StreamEvent } from "./types";
+import type { ResumeConfirmation } from "./api";
 import {
   getAgents,
   getSessions,
@@ -181,17 +182,21 @@ export default function App() {
   );
 
   const handleToolConfirm = useCallback(
-    async (approved: boolean, denial?: string) => {
+    async (confirmation: ResumeConfirmation, reason?: string, toolName?: string) => {
       if (!currentSession?.id || !pendingToolConfirm) return;
+      setPendingToolConfirm(null);
       try {
-        await resumeSession(currentSession.id, { approved, denial });
-        setPendingToolConfirm(null);
-        loadSessionDetail(currentSession.id);
+        await resumeSession(currentSession.id, {
+          confirmation,
+          ...(reason ? { reason } : {}),
+          ...(toolName ? { tool_name: toolName } : {}),
+        });
       } catch (e) {
+        setIsStreaming(false);
         setError(e instanceof Error ? e.message : "Resume failed");
       }
     },
-    [currentSession?.id, pendingToolConfirm, loadSessionDetail],
+    [currentSession?.id, pendingToolConfirm],
   );
 
   const handleToggleYolo = useCallback(async () => {
@@ -401,7 +406,7 @@ export default function App() {
       {pendingToolConfirm && (
         <ToolConfirmModal
           event={pendingToolConfirm}
-          onConfirm={(approved, denial) => handleToolConfirm(approved, denial)}
+          onConfirm={(confirmation, reason, toolName) => handleToolConfirm(confirmation, reason, toolName)}
         />
       )}
     </div>
