@@ -40,6 +40,16 @@ export function ChatView({
     setInput("");
   };
 
+  const displayMessages = useMemo(() => {
+    const withContent = messages.filter((m) => (m.content ?? "").trim() !== "");
+    if (!isStreaming && streamingMessages.length === 0) return withContent;
+    const streamingDisplay =
+      isStreaming && streamingMessages.length === 0
+        ? [{ role: "assistant" as const, content: "" }]
+        : streamingMessages;
+    return [...withContent, ...streamingDisplay];
+  }, [messages, streamingMessages, isStreaming]);
+
   // No session selected
   if (!session) {
     return (
@@ -74,16 +84,6 @@ export function ChatView({
       </div>
     );
   }
-
-  const displayMessages = useMemo(() => {
-    const withContent = messages.filter((m) => (m.content ?? "").trim() !== "");
-    if (!isStreaming && streamingMessages.length === 0) return withContent;
-    const streamingDisplay =
-      isStreaming && streamingMessages.length === 0
-        ? [{ role: "assistant" as const, content: "" }]
-        : streamingMessages;
-    return [...withContent, ...streamingDisplay];
-  }, [messages, streamingMessages, isStreaming]);
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
