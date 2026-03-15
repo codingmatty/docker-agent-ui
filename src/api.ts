@@ -77,6 +77,7 @@ export function sessionResponseToMessages(detail: GetSessionResponse | null | un
       continue;
     }
     // Nested: item.message.message (session.Message wrapping chat.Message)
+    const itemAgentName = typeof it.agentName === 'string' ? it.agentName : undefined;
     const wrapper = (it.message ?? it.Message) as Record<string, unknown> | undefined;
     if (!wrapper) continue;
     let inner = (wrapper.message ?? wrapper.Message) as Record<string, unknown> | undefined;
@@ -139,6 +140,7 @@ export function sessionResponseToMessages(detail: GetSessionResponse | null | un
       role: role === 'assistant' ? 'assistant' : role === 'user' ? 'user' : 'assistant',
       content: content ?? '',
       ...(thoughts.length > 0 ? { thoughts } : {}),
+      ...(itemAgentName ? { agentName: itemAgentName } : {}),
     });
   }
   return out;

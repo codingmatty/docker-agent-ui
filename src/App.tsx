@@ -386,6 +386,7 @@ export default function App() {
             session={currentSession}
             messages={sessionDetail?.messages ?? []}
             streamingContent={streamingContent}
+            streamingAgent={selectedAgent}
             isStreaming={isStreaming}
             onSendMessage={handleSendMessage}
             onNewSession={handleNewSession}

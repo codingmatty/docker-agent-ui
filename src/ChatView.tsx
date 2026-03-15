@@ -6,6 +6,7 @@ interface ChatViewProps {
   session: Session | null;
   messages: Message[];
   streamingContent: string;
+  streamingAgent?: string;
   isStreaming: boolean;
   onSendMessage: (content: string) => void;
   onNewSession: () => void;
@@ -15,6 +16,7 @@ export function ChatView({
   session,
   messages,
   streamingContent,
+  streamingAgent,
   isStreaming,
   onSendMessage,
   onNewSession,
@@ -80,7 +82,7 @@ export function ChatView({
     streamingContent || isStreaming
       ? [
           ...withContent,
-          { role: "assistant" as const, content: streamingContent },
+          { role: "assistant" as const, content: streamingContent, agentName: streamingAgent },
         ]
       : withContent;
 
@@ -150,7 +152,7 @@ export function ChatView({
                       isUser ? "text-accent/65" : "text-primary/65"
                     }`}
                   >
-                    {isUser ? "you" : "agent"}
+                    {isUser ? "you" : (msg.agentName || "agent")}
                   </div>
 
                   {isUser ? (

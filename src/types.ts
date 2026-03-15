@@ -17,6 +17,8 @@ export interface Message {
   content: string;
   /** When set, shown as collapsible "Thoughts" (from API content parts with type "thinking"). */
   thoughts?: string[];
+  /** The agent that produced this message (e.g. "developer", "root"). */
+  agentName?: string;
 }
 
 export interface SessionDetail extends Session {
