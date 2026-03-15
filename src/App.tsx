@@ -197,7 +197,11 @@ export default function App() {
   );
 
   const handleToolConfirm = useCallback(
-    async (confirmation: ResumeConfirmation, reason?: string, toolName?: string) => {
+    async (
+      confirmation: ResumeConfirmation,
+      reason?: string,
+      toolName?: string,
+    ) => {
       if (!currentSession?.id || !pendingToolConfirm) return;
       setPendingToolConfirm(null);
       try {
@@ -421,7 +425,10 @@ export default function App() {
       {pendingToolConfirm && (
         <ToolConfirmModal
           event={pendingToolConfirm}
-          onConfirm={(confirmation, reason, toolName) => handleToolConfirm(confirmation, reason, toolName)}
+          latestMessage={
+            streamingMessages[streamingMessages.length - 1]?.content
+          }
+          onConfirm={handleToolConfirm}
         />
       )}
     </div>

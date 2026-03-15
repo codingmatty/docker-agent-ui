@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type { StreamEvent } from "./types";
 import type { ResumeConfirmation } from "./api";
 
 interface ToolConfirmModalProps {
   event: StreamEvent;
+  latestMessage?: string;
   onConfirm: (
     confirmation: ResumeConfirmation,
     reason?: string,
@@ -11,10 +12,29 @@ interface ToolConfirmModalProps {
   ) => void;
 }
 
-export function ToolConfirmModal({ event, onConfirm }: ToolConfirmModalProps) {
+function extractShellCommand(event: StreamEvent): string | null {
+  const ev = event as Record<string, unknown>;
+  const toolCalls = Array.isArray(ev.tool_calls)
+    ? (ev.tool_calls as unknown[])
+    : [];
+  const first = toolCalls[0] as Record<string, unknown> | undefined;
+  const fn = first?.function as Record<string, unknown> | undefined;
+  if (fn?.name !== "shell") return null;
+  try {
+    const args = JSON.parse(fn.arguments as string);
+    return typeof args.cmd === "string" ? args.cmd : null;
+  } catch {
+    return null;
+  }
+}
+
+export function ToolConfirmModal({
+  event,
+  latestMessage,
+  onConfirm,
+}: ToolConfirmModalProps) {
   const [reason, setReason] = useState("");
-  // TODO: Add tool name to the modal from the event.. there is no actual tool_name prop
-  // const toolName = (event as Record<string, unknown>).tool_name as string | undefined;
+  const cmd = useMemo(() => extractShellCommand(event), [event]);
 
   return (
     <dialog open className="modal modal-open">
@@ -29,12 +49,16 @@ export function ToolConfirmModal({ event, onConfirm }: ToolConfirmModalProps) {
 
         {/* ── Body ─────────────────────────────────────────── */}
         <div className="px-5 py-4 space-y-3">
-          <p className="font-mono text-[10px] text-base-content/65 uppercase tracking-widest">
-            Review the tool call below — approve or reject execution.
+          {latestMessage && (
+            <p className="text-sm text-base-content/75 leading-relaxed border-l-2 border-base-300 pl-3">
+              {latestMessage}
+            </p>
+          )}
+          <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-base-content/45">
+            command
           </p>
-
-          <pre className="bg-base-100 border border-base-300 px-4 py-3 rounded-sm text-[11px] font-mono text-base-content/60 leading-relaxed overflow-x-auto max-h-64 overflow-y-auto">
-            {JSON.stringify(event, null, 2)}
+          <pre className="bg-base-100 border border-base-300 px-4 py-3 rounded-sm text-[11px] font-mono text-base-content/80 leading-relaxed overflow-x-auto whitespace-pre-wrap break-all">
+            {cmd ?? JSON.stringify(event, null, 2)}
           </pre>
 
           <input
