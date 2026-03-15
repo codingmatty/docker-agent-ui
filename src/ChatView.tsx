@@ -1,12 +1,11 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useMemo } from "react";
 import type { Session, Message } from "./types";
 import { MessageBody } from "./MessageBody";
 
 interface ChatViewProps {
   session: Session | null;
   messages: Message[];
-  streamingContent: string;
-  streamingAgent?: string;
+  streamingMessages: Message[];
   isStreaming: boolean;
   onSendMessage: (content: string) => void;
   onNewSession: () => void;
@@ -15,8 +14,7 @@ interface ChatViewProps {
 export function ChatView({
   session,
   messages,
-  streamingContent,
-  streamingAgent,
+  streamingMessages,
   isStreaming,
   onSendMessage,
   onNewSession,
@@ -27,7 +25,7 @@ export function ChatView({
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, streamingContent]);
+  }, [messages, streamingMessages]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,14 +75,15 @@ export function ChatView({
     );
   }
 
-  const withContent = messages.filter((m) => (m.content ?? "").trim() !== "");
-  const displayMessages =
-    streamingContent || isStreaming
-      ? [
-          ...withContent,
-          { role: "assistant" as const, content: streamingContent, agentName: streamingAgent },
-        ]
-      : withContent;
+  const displayMessages = useMemo(() => {
+    const withContent = messages.filter((m) => (m.content ?? "").trim() !== "");
+    if (!isStreaming && streamingMessages.length === 0) return withContent;
+    const streamingDisplay =
+      isStreaming && streamingMessages.length === 0
+        ? [{ role: "assistant" as const, content: "" }]
+        : streamingMessages;
+    return [...withContent, ...streamingDisplay];
+  }, [messages, streamingMessages, isStreaming]);
 
   return (
     <div className="flex-1 flex flex-col min-h-0">

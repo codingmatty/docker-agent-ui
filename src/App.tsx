@@ -35,7 +35,7 @@ export default function App() {
     messages: Message[];
   } | null>(null);
   const [selectedAgent, setSelectedAgent] = useState<string>("");
-  const [streamingContent, setStreamingContent] = useState("");
+  const [streamingMessages, setStreamingMessages] = useState<Message[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [pendingToolConfirm, setPendingToolConfirm] =
     useState<StreamEvent | null>(null);
@@ -95,7 +95,7 @@ export default function App() {
       setSessions((prev) => [session, ...prev]);
       setCurrentSession(session);
       setSessionDetail({ messages: [] });
-      setStreamingContent("");
+      setStreamingMessages([]);
       setError(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to create session");
@@ -105,7 +105,7 @@ export default function App() {
   const handleSelectSession = useCallback((session: Session) => {
     setCurrentSession(session);
     setPendingToolConfirm(null);
-    setStreamingContent("");
+    setStreamingMessages([]);
   }, []);
 
   const handleDeleteSession = useCallback(
@@ -131,7 +131,7 @@ export default function App() {
         ...(sessionDetail?.messages ?? []),
         { role: "user", content },
       ];
-      setStreamingContent("");
+      setStreamingMessages([]);
       setIsStreaming(true);
       setError(null);
       setSessionDetail((prev) => ({
@@ -144,12 +144,27 @@ export default function App() {
           messages,
           (event: StreamEvent) => {
             switch (event.type) {
-              case "agent_choice":
-                setStreamingContent((prev) => prev + (event.content ?? ""));
+              case "agent_choice": {
+                const chunk = (event as { content?: string }).content ?? "";
+                const agentName = event.agent ?? selectedAgent;
+                setStreamingMessages((prev) => {
+                  const last = prev[prev.length - 1];
+                  if (last && last.agentName === agentName) {
+                    return [
+                      ...prev.slice(0, -1),
+                      { ...last, content: last.content + chunk },
+                    ];
+                  }
+                  return [
+                    ...prev,
+                    { role: "assistant", content: chunk, agentName },
+                  ];
+                });
                 break;
+              }
               case "stream_stopped":
                 setIsStreaming(false);
-                setStreamingContent("");
+                setStreamingMessages([]);
                 loadSessionDetail(currentSession.id);
                 loadSessions();
                 break;
@@ -385,8 +400,7 @@ export default function App() {
           <ChatView
             session={currentSession}
             messages={sessionDetail?.messages ?? []}
-            streamingContent={streamingContent}
-            streamingAgent={selectedAgent}
+            streamingMessages={streamingMessages}
             isStreaming={isStreaming}
             onSendMessage={handleSendMessage}
             onNewSession={handleNewSession}
