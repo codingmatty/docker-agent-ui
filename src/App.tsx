@@ -285,7 +285,7 @@ export default function App() {
         onChange={(e) => setSidebarOpen(e.target.checked)}
       />
 
-      <div className="drawer-content flex flex-col min-h-screen">
+      <div className="drawer-content flex flex-col h-screen">
         {/* ── Header ──────────────────────────────────────────── */}
         <header className="h-12 flex items-center px-4 gap-3 bg-base-200 border-b border-base-300 sticky top-0 z-10 shrink-0">
           {/* Mobile hamburger */}
