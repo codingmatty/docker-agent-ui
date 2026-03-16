@@ -13,7 +13,7 @@ export interface Session {
 }
 
 export interface Message {
-  role: 'user' | 'assistant' | 'system';
+  role: "user" | "assistant" | "system";
   content: string;
   /** When set, shown as collapsible "Thoughts" (from API content parts with type "thinking"). */
   thoughts?: string[];
@@ -35,8 +35,16 @@ export interface SessionItemMessage {
     Role?: string;
     content?: string;
     Content?: string;
-    multi_content?: Array<{ type?: string; text?: string; [key: string]: unknown }>;
-    MultiContent?: Array<{ type?: string; text?: string; [key: string]: unknown }>;
+    multi_content?: Array<{
+      type?: string;
+      text?: string;
+      [key: string]: unknown;
+    }>;
+    MultiContent?: Array<{
+      type?: string;
+      text?: string;
+      [key: string]: unknown;
+    }>;
     [key: string]: unknown;
   };
   implicit?: boolean;
@@ -51,13 +59,14 @@ export interface SessionItem {
 
 // SSE event types from agent execution
 export type StreamEventType =
-  | 'stream_started'
-  | 'stream_stopped'
-  | 'agent_choice'
-  | 'tool_call'
-  | 'tool_call_confirmation'
-  | 'tool_call_response'
-  | 'error';
+  | "stream_started"
+  | "stream_stopped"
+  | "agent_choice"
+  | "tool_call"
+  | "tool_call_confirmation"
+  | "tool_call_response"
+  | "error"
+  | "message_added";
 
 export interface StreamEventBase {
   type: StreamEventType;
@@ -66,27 +75,27 @@ export interface StreamEventBase {
 }
 
 export interface AgentChoiceEvent extends StreamEventBase {
-  type: 'agent_choice';
+  type: "agent_choice";
   content: string;
 }
 
 export interface ToolCallEvent extends StreamEventBase {
-  type: 'tool_call';
+  type: "tool_call";
   [key: string]: unknown;
 }
 
 export interface ToolCallConfirmationEvent extends StreamEventBase {
-  type: 'tool_call_confirmation';
+  type: "tool_call_confirmation";
   [key: string]: unknown;
 }
 
 export interface ToolCallResponseEvent extends StreamEventBase {
-  type: 'tool_call_response';
+  type: "tool_call_response";
   [key: string]: unknown;
 }
 
 export interface ErrorEvent extends StreamEventBase {
-  type: 'error';
+  type: "error";
   message?: string;
 }
 
@@ -96,4 +105,4 @@ export type StreamEvent =
   | ToolCallConfirmationEvent
   | ToolCallResponseEvent
   | ErrorEvent
-  | (StreamEventBase & { type: 'stream_started' | 'stream_stopped' });
+  | StreamEventBase;

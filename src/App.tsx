@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import type { Agent, Session, Message, StreamEvent } from "./types";
 import type { ResumeConfirmation } from "./api";
 import {
@@ -36,6 +36,7 @@ export default function App() {
   } | null>(null);
   const [selectedAgent, setSelectedAgent] = useState<string>("");
   const [streamingMessages, setStreamingMessages] = useState<Message[]>([]);
+  const breakNextChunk = useRef(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [pendingToolConfirm, setPendingToolConfirm] =
     useState<StreamEvent | null>(null);
@@ -132,6 +133,7 @@ export default function App() {
         { role: "user", content },
       ];
       setStreamingMessages([]);
+      breakNextChunk.current = false;
       setIsStreaming(true);
       setError(null);
       setSessionDetail((prev) => ({
@@ -147,9 +149,11 @@ export default function App() {
               case "agent_choice": {
                 const chunk = (event as { content?: string }).content ?? "";
                 const agentName = event.agent ?? selectedAgent;
+                const shouldBreak = breakNextChunk.current;
+                breakNextChunk.current = false;
                 setStreamingMessages((prev) => {
                   const last = prev[prev.length - 1];
-                  if (last && last.agentName === agentName) {
+                  if (!shouldBreak && last && last.agentName === agentName) {
                     return [
                       ...prev.slice(0, -1),
                       { ...last, content: last.content + chunk },
@@ -163,12 +167,18 @@ export default function App() {
                 break;
               }
               case "stream_stopped":
+              case "message_added":
                 setIsStreaming(false);
                 setStreamingMessages([]);
                 loadSessionDetail(currentSession.id);
                 loadSessions();
                 break;
+              case "tool_call":
+              case "tool_call_response":
+                breakNextChunk.current = true;
+                break;
               case "tool_call_confirmation":
+                breakNextChunk.current = true;
                 setPendingToolConfirm(event);
                 break;
               case "error":
@@ -178,6 +188,7 @@ export default function App() {
                 );
                 break;
               default:
+                breakNextChunk.current = true;
                 break;
             }
           },
