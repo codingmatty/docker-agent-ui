@@ -27,6 +27,25 @@ const themes = [
   "cupcake",
 ];
 
+/** Trim history to fit within a token budget, walking backwards from most recent. */
+function trimHistory(
+  history: Message[],
+  newMessageContent: string,
+  tokenBudget = 30_000,
+): Message[] {
+  const newMessageTokens = Math.ceil(newMessageContent.length / 4);
+  let budget = tokenBudget - newMessageTokens;
+  const result: Message[] = [];
+  for (let i = history.length - 1; i >= 0; i--) {
+    const msg = history[i];
+    const tokens = Math.ceil((msg.content?.length ?? 0) / 4);
+    if (tokens > budget) break;
+    result.unshift(msg);
+    budget -= tokens;
+  }
+  return result;
+}
+
 export default function App() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -129,7 +148,7 @@ export default function App() {
     async (content: string) => {
       if (!currentSession?.id || !selectedAgent) return;
       const messages: Message[] = [
-        ...(sessionDetail?.messages ?? []),
+        ...trimHistory(sessionDetail?.messages ?? [], content),
         { role: "user", content },
       ];
       setStreamingMessages([]);
@@ -182,10 +201,11 @@ export default function App() {
                 setPendingToolConfirm(event);
                 break;
               case "error":
-                setIsStreaming(false);
-                setError(
-                  (event as { message?: string }).message ?? "Agent error",
-                );
+                {
+                  const ev = event as { message?: string; error?: string };
+                  setError(ev.error ?? ev.message ?? "Agent error");
+                  break;
+                }
                 break;
               default:
                 breakNextChunk.current = true;
@@ -399,15 +419,40 @@ export default function App() {
 
         {/* ── Error banner ─────────────────────────────────────── */}
         {error && (
-          <div className="flex items-center justify-between px-4 py-2 bg-error/8 border-b border-error/20 shrink-0">
-            <span className="font-mono text-xs text-error/80">{error}</span>
-            <button
-              type="button"
-              className="font-mono text-[10px] uppercase tracking-wider text-error/75 hover:text-error transition-colors ml-4"
-              onClick={() => setError(null)}
-            >
-              dismiss
-            </button>
+          <div className="px-4 py-3 bg-error/8 border-b border-error/20 shrink-0 space-y-1">
+            <div className="flex items-start justify-between gap-4">
+              <span className="font-mono text-xs text-error/90 leading-relaxed break-all whitespace-pre-wrap">
+                {(() => {
+                  // Try to extract the clean message from nested JSON in the error string
+                  const match = error.match(/\{.*\}/s);
+                  if (match) {
+                    try {
+                      const parsed = JSON.parse(match[0]);
+                      const msg = parsed?.error?.message ?? parsed?.message;
+                      if (msg) return msg;
+                    } catch {
+                      /* fall through */
+                    }
+                  }
+                  return error;
+                })()}
+              </span>
+              <button
+                type="button"
+                className="font-mono text-[10px] uppercase tracking-wider text-error/75 hover:text-error transition-colors shrink-0"
+                onClick={() => setError(null)}
+              >
+                dismiss
+              </button>
+            </div>
+            <details className="group">
+              <summary className="font-mono text-[9px] uppercase tracking-[0.22em] text-error/40 cursor-pointer hover:text-error/60 transition-colors select-none">
+                full error
+              </summary>
+              <pre className="mt-1.5 font-mono text-[10px] text-error/55 leading-relaxed whitespace-pre-wrap break-all max-h-32 overflow-y-auto">
+                {error}
+              </pre>
+            </details>
           </div>
         )}
 
