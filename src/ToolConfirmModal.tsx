@@ -14,11 +14,8 @@ interface ToolConfirmModalProps {
 
 function extractShellCommand(event: StreamEvent): string | null {
   const ev = event as Record<string, unknown>;
-  const toolCalls = Array.isArray(ev.tool_calls)
-    ? (ev.tool_calls as unknown[])
-    : [];
-  const first = toolCalls[0] as Record<string, unknown> | undefined;
-  const fn = first?.function as Record<string, unknown> | undefined;
+  const toolCall = ev.tool_call as Record<string, unknown> | undefined;
+  const fn = toolCall?.function as Record<string, unknown> | undefined;
   if (fn?.name !== "shell") return null;
   try {
     const args = JSON.parse(fn.arguments as string);
@@ -57,7 +54,7 @@ export function ToolConfirmModal({
           <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-base-content/45">
             command
           </p>
-          <pre className="bg-base-100 border border-base-300 px-4 py-3 rounded-sm text-[11px] font-mono text-base-content/80 leading-relaxed overflow-x-auto whitespace-pre-wrap break-all">
+          <pre className="bg-base-100 border border-base-300 px-4 py-3 rounded-sm text-[11px] font-mono text-base-content/80 leading-relaxed overflow-x-auto whitespace-pre-wrap break-all max-h-64 overflow-y-auto">
             {cmd ?? JSON.stringify(event, null, 2)}
           </pre>
 
